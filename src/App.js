@@ -15,6 +15,8 @@ import DispatchContext from './DispatchContext';
 import { useImmerReducer } from 'use-immer'
 import './App.css';
 import Axios from 'axios';
+import EditPost from './components/EditPost';
+
 Axios.defaults.baseURL = "http://localhost:9876";
 
 const App = () => {
@@ -73,15 +75,17 @@ const App = () => {
           <FlashMessages flashMessages={state.flashMessages} />
           <Header />
           <Switch>
-
             <Route path='/profile/:username'>
               <Profile />
             </Route>
             <Route path='/' exact>
               {state.loggedIn ? <Home /> : <HomeGuest />}
             </Route>
-            <Route path='/post/:id'>
+            <Route path='/post/:id' exact>
               <ViewSinglePost />
+            </Route>
+            <Route path='/post/:id/edit' exact>
+              <EditPost />
             </Route>
             <Route path='/create-post'>
               <CreatePost />
