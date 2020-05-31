@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useContext } from 'react'
 import Page from './Page';
 import Axios from 'axios';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, withRouter } from 'react-router-dom';
 import LoadingDotsIcon from './LoadingDotsIcon';
 import { useImmerReducer } from 'use-immer';
 import StateContext from "../StateContext";
 import DispatchContext from '../DispatchContext'
+import NotFound from './NotFound';
 
-const EditPost = () => {
+const EditPost = (props) => {
   const globalState = useContext(StateContext);
   const globalDispatch = useContext(DispatchContext);
 
@@ -25,7 +26,8 @@ const EditPost = () => {
     isFetching: true,
     isSaving: false,
     id: useParams().id,
-    sendCount: 0
+    sendCount: 0,
+    notFound: false
   }
 
   const ourReducer = (draft, action) => {
@@ -66,6 +68,9 @@ const EditPost = () => {
           draft.body.message = "You must provide body content";
         }
         return;
+      case "notFound":
+        draft.notFound = true;
+        return;
       default:
         return draft;
     }
@@ -86,7 +91,17 @@ const EditPost = () => {
     async function fetchPost() {
       try {
         const response = await Axios.get(`/post/${state.id}`, { cancelToken: ourRequest.token });
-        dispatch({ type: "fetchComplete", value: response.data })
+        if (response.data) {
+          dispatch({ type: "fetchComplete", value: response.data });
+          if (globalState.user.username != response.data.author.username) {
+            console.log("hi");
+            globalDispatch({ type: "flashMessage", value: "You do not have permission to edit this post." })
+            // Redirect to homepage
+            props.history.push("/");
+          }
+        } else {
+          dispatch({ type: "notFound" })
+        }
       } catch (e) {
         console.log("There was a problem or the request was cancelled.");
       }
@@ -125,6 +140,12 @@ const EditPost = () => {
     }
   }, [state.sendCount]);
 
+  if (state.notFound) {
+    return (
+      <NotFound />
+    )
+  }
+
   if (state.isFetching)
     return (
       <Page title="...">
@@ -134,7 +155,12 @@ const EditPost = () => {
 
   return (
     <Page title="EidtPost">
-      <form onSubmit={submitHandler}>
+      <Link
+        className="small font-weight-bold"
+        to={`/post/${state.id}`}>
+        &laquo; Back to post permalink
+      </Link>
+      <form className="mt-3" onSubmit={submitHandler}>
         <div className="form-group">
           <label htmlFor="post-title" className="text-muted mb-1">
             <small>Title</small>
@@ -177,4 +203,5 @@ const EditPost = () => {
   )
 }
 
-export default EditPost
+export default withRouter(EditPost)
+

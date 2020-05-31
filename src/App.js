@@ -16,6 +16,7 @@ import { useImmerReducer } from 'use-immer'
 import './App.css';
 import Axios from 'axios';
 import EditPost from './components/EditPost';
+import NotFound from './components/NotFound';
 
 Axios.defaults.baseURL = "http://localhost:9876";
 
@@ -95,6 +96,9 @@ const App = () => {
             </Route>
             <Route path='/terms'>
               <Terms />
+            </Route>
+            <Route>
+              <NotFound />
             </Route>
           </Switch>
           <Footer />
