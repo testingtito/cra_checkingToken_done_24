@@ -17,6 +17,8 @@ import './App.css';
 import Axios from 'axios';
 import EditPost from './components/EditPost';
 import NotFound from './components/NotFound';
+import Search from './components/Search';
+import { CSSTransition } from 'react-transition-group';
 
 Axios.defaults.baseURL = "http://localhost:9876";
 
@@ -32,7 +34,8 @@ const App = () => {
       token: localStorage.getItem("complexappToken"),
       username: localStorage.getItem("complexappUsername"),
       avatar: localStorage.getItem("complexappAvatar"),
-    }
+    },
+    isSearchOpen: false
   };
 
   // Reducer function: this is where you would actually say how these things happen or
@@ -51,6 +54,14 @@ const App = () => {
       case "flashMessage":
         draft.flashMessages.push(action.value)
         return;
+      case "openSearch":
+        draft.isSearchOpen = true;
+        return;
+      case "closeSearch":
+        draft.isSearchOpen = false;
+        return;
+      default:
+        return draft;
     };
   }
 
@@ -101,6 +112,13 @@ const App = () => {
               <NotFound />
             </Route>
           </Switch>
+          <CSSTransition
+            timeout={330}
+            in={state.isSearchOpen}
+            classNames="search-overlay"
+            unmountOnExit>
+            <Search />
+          </CSSTransition>
           <Footer />
         </BrowserRouter>
       </DispatchContext.Provider>
