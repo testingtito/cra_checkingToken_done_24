@@ -34,7 +34,7 @@ const ViewSinglePost = (props) => {
     return () => {
       ourRequest.cancel();
     }
-  }, []);
+  }, [id]);
 
   // loading has completed and post is still undefined, 
   // if the server didn't enter anything into it like an object to a post, 
