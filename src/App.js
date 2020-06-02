@@ -18,6 +18,7 @@ import Axios from 'axios';
 import EditPost from './components/EditPost';
 import NotFound from './components/NotFound';
 import Search from './components/Search';
+import Chat from './components/Chat';
 import { CSSTransition } from 'react-transition-group';
 
 Axios.defaults.baseURL = "http://localhost:9876";
@@ -35,7 +36,8 @@ const App = () => {
       username: localStorage.getItem("complexappUsername"),
       avatar: localStorage.getItem("complexappAvatar"),
     },
-    isSearchOpen: false
+    isSearchOpen: false,
+    isChatOpen: false
   };
 
   // Reducer function: this is where you would actually say how these things happen or
@@ -57,8 +59,11 @@ const App = () => {
       case "openSearch":
         draft.isSearchOpen = true;
         return;
-      case "closeSearch":
-        draft.isSearchOpen = false;
+      case "toggleChat":
+        draft.isChatOpen = !draft.isChatOpen;
+        return;
+      case "closeChat":
+        draft.isChatOpen = false;
         return;
       default:
         return draft;
@@ -119,6 +124,7 @@ const App = () => {
             unmountOnExit>
             <Search />
           </CSSTransition>
+          <Chat />
           <Footer />
         </BrowserRouter>
       </DispatchContext.Provider>
