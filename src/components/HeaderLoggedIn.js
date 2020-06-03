@@ -11,6 +11,7 @@ const HeaderLoggedIn = () => {
 
   const handleLogout = () => {
     globalDispatch({ type: "logout" });  // no more setLoggedIn(false);  
+    globalDispatch({ type: "flashMessage", value: "You have successfully logged out." });
   }
 
   const handleSearchIcon = e => {
