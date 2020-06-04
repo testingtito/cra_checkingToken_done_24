@@ -92,6 +92,36 @@ const App = () => {
     }
   }, [state.loggedIn]);
 
+  // Check if token has expired or not on first render
+  useEffect(() => {
+    if (state.loggedIn) {
+      // create a variable that will store cancel token, so we can cancel the Axios requst
+      // if this component unmounts in the middle of the request
+      const ourRequest = Axios.CancelToken.source();
+      async function fetchResults() {
+        try {
+          // 1st argument: path 2nd argument: the data we want to send along 3rd argument: cancel toekn
+          // true is a valid token, the second is not.
+          const response = await Axios.post(
+            '/checkToken',
+            { token: state.user.token },
+            { cancelToken: ourRequest.token });
+
+          if (!response.data) { // if the token is not valid
+            // make a use log out and show the flash message
+            dispatch({ type: "logout" });
+            dispatch({ type: "flashMessage", value: "Your session has expired. Please log in again." });
+          }
+        } catch (e) {
+          console.log("There was a problem or the request was cancelled.");
+        }
+      }
+      fetchResults();
+      return () => ourRequest.cancel();
+    }
+  }, []);
+
+
   return (
     <StateContext.Provider value={state}>
       <DispatchContext.Provider value={dispatch}>
